@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KCI 빅데이터/AI 연구 트렌드 대시보드</title>
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-glow: rgba(79, 70, 229, 0.5);
+            --bg-dark: #0f172a;
+            --glass-bg: rgba(30, 41, 59, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', 'Pretendard', sans-serif;
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(79, 70, 229, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(16, 185, 129, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(236, 72, 153, 0.15) 0px, transparent 50%);
+            background-attachment: fixed;
+            color: var(--text-main);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(to right, #60a5fa, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        /* Glassmorphism Card Style */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 0 15px var(--primary-glow);
+        }
+
+        /* KPI Grid */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            animation: fadeInUp 1s ease-out 0.2s both;
+        }
+
+        .kpi-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .kpi-value {
+            font-size: 3rem;
+            font-weight: 800;
+            color: #fff;
+            text-shadow: 0 0 10px rgba(255,255,255,0.3);
+            margin: 0.5rem 0;
+        }
+
+        .kpi-label {
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        /* Charts Grid */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 3fr 2fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            animation: fadeInUp 1s ease-out 0.4s both;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 400px;
+            width: 100%;
+        }
+
+        /* Table */
+        .table-container {
+            animation: fadeInUp 1s ease-out 0.6s both;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        th {
+            background-color: rgba(255,255,255,0.05);
+            color: #e2e8f0;
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background-color: rgba(255,255,255,0.02);
+        }
+
+        .year-badge {
+            background: rgba(96, 165, 250, 0.2);
+            color: #93c5fd;
+            padding: 0.2rem 0.6rem;
+            border-radius: 1rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        /* Animations */
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 1024px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>KCI 빅데이터/AI 연구 판도 대시보드</h1>
+            <p>2013 - 2026 국내 주요 학술지 연구 동향 분석</p>
+        </header>
+
+        <div class="kpi-grid">
+            <div class="glass-card kpi-item">
+                <div class="kpi-label">총 분석 논문 수</div>
+                <div class="kpi-value">900</div>
+                <div class="kpi-label">편</div>
+            </div>
+            <div class="glass-card kpi-item">
+                <div class="kpi-label">연구 정점 연도</div>
+                <div class="kpi-value" style="color: #60a5fa;">2022</div>
+                <div class="kpi-label">123편 발행</div>
+            </div>
+            <div class="glass-card kpi-item">
+                <div class="kpi-label">최상위 메인 키워드</div>
+                <div class="kpi-value" style="color: #34d399;">인공지능</div>
+                <div class="kpi-label">317회 출현</div>
+            </div>
+        </div>
+
+        <div class="charts-grid">
+            <div class="glass-card">
+                <h2 style="margin-top: 0; font-size: 1.2rem;">연도별 논문 발행 추이 (트렌드)</h2>
+                <div class="chart-container">
+                    <canvas id="trendChart"></canvas>
+                </div>
+            </div>
+            <div class="glass-card">
+                <h2 style="margin-top: 0; font-size: 1.2rem;">핵심 키워드 출현 빈도 TOP 15</h2>
+                <div class="chart-container">
+                    <canvas id="keywordChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="charts-grid" style="grid-template-columns: 1fr; margin-bottom: 2rem;">
+            <div class="glass-card">
+                <h2 style="margin-top: 0; font-size: 1.2rem;">'인공지능' & '빅데이터' 동시 출현 연관어 분석 (Radar Chart)</h2>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0; margin-bottom: 1rem;">두 핵심 키워드가 어떤 세부 기술/이슈와 가장 많이 결합되어 연구되는지 보여줍니다.</p>
+                <div class="chart-container" style="height: 450px; display: flex; justify-content: center;">
+                    <canvas id="coOccurrenceChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-card table-container">
+            <h2 style="margin-top: 0; font-size: 1.2rem;">주목할 만한 논문 (문헌 리뷰 후보)</h2>
+            <table id="papersTable">
+                <thead>
+                    <tr>
+                        <th>발행연도</th>
+                        <th>논문명</th>
+                        <th>저자</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- JS로 채워짐 -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // 하드코딩된 추출 데이터
+        const dashboardData = {
+            yearCount: {
+                "2013": 1, "2014": 2, "2016": 12, "2017": 51, "2018": 82, 
+                "2019": 95, "2020": 122, "2021": 121, "2022": 123, "2023": 95, 
+                "2024": 105, "2025": 77, "2026": 14
+            },
+            topKeywords: [
+                {"text": "인공지능", "count": 317}, {"text": "빅데이터", "count": 306},
+                {"text": "4차 산업혁명", "count": 67}, {"text": "AI", "count": 67},
+                {"text": "Big Data", "count": 66}, {"text": "Artificial Intelligence", "count": 63},
+                {"text": "사물인터넷", "count": 39}, {"text": "블록체인", "count": 30},
+                {"text": "딥러닝", "count": 25}, {"text": "알고리즘", "count": 25},
+                {"text": "인공지능(AI)", "count": 22}, {"text": "머신러닝", "count": 20},
+                {"text": "IoT", "count": 19}, {"text": "개인정보", "count": 15},
+                {"text": "토픽 모델링", "count": 10}
+            ],
+            // 임시 연관어 데이터 (실제 데이터 추출 전 레이아웃 확인용)
+            coOccurrence: {
+                labels: ["사물인터넷", "블록체인", "딥러닝", "머신러닝", "개인정보", "저작권", "클라우드", "플랫폼"],
+                aiData: [8, 5, 20, 15, 4, 7, 3, 5],
+                bigdataData: [12, 8, 5, 6, 11, 1, 6, 4]
+            },
+            topPapers: [
+                {"title": "생성형 AI 확산과 저작권 규율 방안", "author": "정윤경", "year": "2023"},
+                {"title": "우리나라의 디지털헬스케어 관련 법적 규제와 적용 방향에 관한 고찰", "author": "백경희", "year": "2025"},
+                {"title": "챗GPT 관련 사회적 이슈에 대한 탐색적 연구: 뉴스 빅데이터 기반 토픽 모델링 분석을 중심으로", "author": "김태종;한송이", "year": "2023"},
+                {"title": "소셜미디어기반의 지능적 피부 상태 진단 정보시스템 개발", "author": "김형훈;옥승호", "year": "2022"},
+                {"title": "인공지능사회에 대한 철학적 비판과 그 의미에 대한 탐구", "author": "손영창", "year": "2024"},
+                {"title": "4차 산업혁명의 주요국 현황비교에 따른 활성화 방안에 관한 연구", "author": "정분도;홍미선", "year": "2018"},
+                {"title": "정보통신법제 상 지식재산권에 관한 특별규정 및 지식재산법제와 정보통신법제의 바람직한 관계에 대한 시론적 검토", "author": "이성엽", "year": "2018"},
+                {"title": "Prediction Model of Real Estate Transaction Price with the LSTM Model based on AI and Bigdata", "author": "이정현;김후빈;심교언", "year": "2022"},
+                {"title": "빅데이터 분석을 통한 AI 영어학습에 대한 사용자 인식 연구: 최근 3년간의 소셜 미디어 데이터를 중심으로", "author": "심혜린;김협;박지섭", "year": "2025"},
+                {"title": "딥러닝 시티: 스마트 시티의 빅데이터 분석 프레임워크 제안", "author": "김화종", "year": "2017"},
+                {"title": "국내 인공지능분야 연구동향 분석 –토픽모델링과 의미연결망분석을 중심으로-", "author": "황서이;김문기", "year": "2019"},
+                {"title": "DX·AX 시대 데이터의 본질과 무역에서의 의미", "author": "정희진", "year": "2026"},
+                {"title": "보편적 빅데이터와 빅데이터 교육의 방향성 연구 - 빅데이터 전문가의 인식 조사를 기반으로", "author": "박윤수;이수진", "year": "2020"},
+                {"title": "빅데이터의 이용활성화를 위한 저작권법적 고찰 - 데이터 마이닝 등을 중심으로 -", "author": "최종모", "year": "2018"},
+                {"title": "인공지능(AI) 기술을 활용한 스마트 해양경찰 구축 방안", "author": "윤성현", "year": "2018"},
+                {"title": "인공지능 알고리즘 적용 한국프로농구 정규리그 경기 결과 예측", "author": "김필수;이상현;전성삼", "year": "2025"},
+                {"title": "인공지능시대의 저작권법 과제", "author": "정상조", "year": "2018"},
+                {"title": "OTT 이미지에서 인공지능을 활용한 배우의 감정 표정변환 기술", "author": "김정환", "year": "2023"},
+                {"title": "보건의료에서의 인공지능 적용과 관련된 법적 과제에 대한 개관", "author": "이인영", "year": "2019"},
+                {"title": "핀테크 혁신의 현황과 전망", "author": "변진호", "year": "2018"},
+                {"title": "인공지능 거짓말의 특성 이해 - 거짓말에 대한 윤리학적 담론을 중심으로", "author": "김봉제", "year": "2020"},
+                {"title": "리걸테크의 변혁 — 컴퓨터, 디지털 그리고 지능 —", "author": "이민령", "year": "2025"},
+                {"title": "2021년 개정 부정경쟁방지법상 데이터의 부정사용행위의 판단기준에 대한 연구", "author": "이규호", "year": "2022"},
+                {"title": "인공지능의 개인정보 자동화 처리가 야기하는 차별 문제에 관한 연구", "author": "김성용;정관영", "year": "2019"}
+            ]
+        };
+
+        // Chart.js 기본 테마 설정 (Dark mode)
+        Chart.defaults.color = '#94a3b8';
+        Chart.defaults.font.family = "'Inter', sans-serif";
+
+        // 1. 연도별 추이 그래프 (Line Chart)
+        const ctxTrend = document.getElementById('trendChart').getContext('2d');
+        
+        // Gradient for line
+        let gradientLine = ctxTrend.createLinearGradient(0, 0, 0, 400);
+        gradientLine.addColorStop(0, 'rgba(96, 165, 250, 0.5)');
+        gradientLine.addColorStop(1, 'rgba(96, 165, 250, 0.0)');
+
+        new Chart(ctxTrend, {
+            type: 'line',
+            data: {
+                labels: Object.keys(dashboardData.yearCount),
+                datasets: [{
+                    label: '논문 발행 건수',
+                    data: Object.values(dashboardData.yearCount),
+                    borderColor: '#60a5fa',
+                    backgroundColor: gradientLine,
+                    borderWidth: 3,
+                    pointBackgroundColor: '#fff',
+                    pointBorderColor: '#60a5fa',
+                    pointBorderWidth: 2,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                    },
+                    x: {
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+
+        // 2. 키워드 빈도 그래프 (Bar Chart)
+        const ctxKeyword = document.getElementById('keywordChart').getContext('2d');
+        new Chart(ctxKeyword, {
+            type: 'bar',
+            data: {
+                labels: dashboardData.topKeywords.map(k => k.text),
+                datasets: [{
+                    label: '출현 빈도',
+                    data: dashboardData.topKeywords.map(k => k.count),
+                    backgroundColor: 'rgba(52, 211, 153, 0.7)',
+                    borderColor: '#34d399',
+                    borderWidth: 1,
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                indexAxis: 'y', // 가로 막대 그래프
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    x: {
+                        grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                    },
+                    y: {
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+
+        // 3. 동시 출현 연관어 그래프 (Radar Chart)
+        const ctxCo = document.getElementById('coOccurrenceChart').getContext('2d');
+        new Chart(ctxCo, {
+            type: 'radar',
+            data: {
+                labels: dashboardData.coOccurrence.labels,
+                datasets: [
+                    {
+                        label: '인공지능과 동시 출현',
+                        data: dashboardData.coOccurrence.aiData,
+                        backgroundColor: 'rgba(236, 72, 153, 0.2)',
+                        borderColor: '#ec4899',
+                        pointBackgroundColor: '#ec4899',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: '#ec4899'
+                    },
+                    {
+                        label: '빅데이터와 동시 출현',
+                        data: dashboardData.coOccurrence.bigdataData,
+                        backgroundColor: 'rgba(52, 211, 153, 0.2)',
+                        borderColor: '#34d399',
+                        pointBackgroundColor: '#34d399',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: '#34d399'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    r: {
+                        angleLines: { color: 'rgba(255, 255, 255, 0.1)' },
+                        grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                        pointLabels: { color: '#94a3b8', font: { size: 13 } },
+                        ticks: { display: false } // 축 숫자 숨김
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: { color: '#e2e8f0', usePointStyle: true }
+                    }
+                }
+            }
+        });
+
+        // 4. 논문 테이블 렌더링
+        const tbody = document.querySelector('#papersTable tbody');
+        dashboardData.topPapers.forEach(paper => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><span class="year-badge">${paper.year}</span></td>
+                <td style="font-weight: 600; color: #f8fafc;">${paper.title}</td>
+                <td style="color: #94a3b8;">${paper.author}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    </script>
+</body>
+</html>
