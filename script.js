@@ -18,6 +18,11 @@ function renderSummary(summary) {
 
 function renderTrendChart(trendData) {
     const ctx = document.getElementById('trendChart').getContext('2d');
+    
+    // Normalize data (0-100% of maximum value for each dataset)
+    const maxPapers = Math.max(...trendData.map(d => d.papers), 1);
+    const maxPrecedents = Math.max(...trendData.map(d => d.precedents), 1);
+    
     new Chart(ctx, {
         type: 'line',
         data: {
@@ -25,7 +30,7 @@ function renderTrendChart(trendData) {
             datasets: [
                 {
                     label: 'Academic Papers (KCI)',
-                    data: trendData.map(d => d.papers),
+                    data: trendData.map(d => (d.papers / maxPapers) * 100),
                     borderColor: '#38bdf8',
                     backgroundColor: 'rgba(56, 189, 248, 0.1)',
                     fill: true,
@@ -33,7 +38,7 @@ function renderTrendChart(trendData) {
                 },
                 {
                     label: 'Precedents (Law)',
-                    data: trendData.map(d => d.precedents),
+                    data: trendData.map(d => (d.precedents / maxPrecedents) * 100),
                     borderColor: '#818cf8',
                     backgroundColor: 'rgba(129, 140, 248, 0.1)',
                     fill: true,
@@ -45,10 +50,44 @@ function renderTrendChart(trendData) {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                legend: { labels: { color: '#f1f5f9' } }
+                legend: { labels: { color: '#f1f5f9' } },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            const index = context.dataIndex;
+                            const originalVal = context.datasetIndex === 0 
+                                ? trendData[index].papers 
+                                : trendData[index].precedents;
+                            label += `${originalVal.toLocaleString()}건 (상대 비중: ${Math.round(context.raw)}%)`;
+                            return label;
+                        }
+                    }
+                }
             },
             scales: {
-                y: { grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: '#94a3b8' } },
+                y: { 
+                    grid: { color: 'rgba(255,255,255,0.1)' }, 
+                    ticks: { 
+                        color: '#94a3b8',
+                        callback: function(value) {
+                            return value + '%';
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: '상대적 성장 추세 (Normalized to Max 100%)',
+                        color: '#94a3b8',
+                        font: {
+                            size: 11
+                        }
+                    },
+                    min: 0,
+                    max: 100
+                },
                 x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
             }
         }
