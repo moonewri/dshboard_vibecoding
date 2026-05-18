@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Tech-Legal Insight Dashboard</title>
+    <title>AI 테크-레갈 인사이트 대시보드</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -12,52 +12,64 @@
     <div class="container">
         <header>
             <div class="logo">
-                <h1>AI Vibe Dashboard <small style="font-size: 0.4em; vertical-align: middle; opacity: 0.6;">v2.0 Insight Edition</small></h1>
+                <h1>AI 테크-레갈 인사이트 대시보드 <small style="font-size: 0.4em; vertical-align: middle; opacity: 0.6;">v3.0 RVI 에디션</small></h1>
             </div>
             <div class="status-badge">
                 <span class="status-dot"></span>
-                API Real-time Synchronized
+                실시간 API 동기화 완료
             </div>
         </header>
 
         <div class="summary-grid">
             <div class="card animate-in" style="animation-delay: 0.1s;">
-                <h3>Total Research Papers</h3>
+                <h3>총 학술 논문 수</h3>
                 <div class="value" id="total-papers">0</div>
-                <p style="color: var(--text-secondary); font-size: 0.8rem; margin-top: 0.5rem;">KCI OpenAPI Latest Data</p>
+                <p style="color: var(--text-secondary); font-size: 0.8rem; margin-top: 0.5rem;">KCI OpenAPI 최신 데이터</p>
             </div>
             <div class="card animate-in" style="animation-delay: 0.2s;">
-                <h3>Total Precedents</h3>
+                <h3>총 사법 판례 수</h3>
                 <div class="value" id="total-precedents">0</div>
-                <p style="color: var(--text-secondary); font-size: 0.8rem; margin-top: 0.5rem;">Law API Full-text Search</p>
+                <p style="color: var(--text-secondary); font-size: 0.8rem; margin-top: 0.5rem;">국가법령 API 통합 검색</p>
             </div>
-            <div class="card animate-in" style="animation-delay: 0.3s;">
-                <h3>Top Legal Risk Area</h3>
-                <div class="value" id="top-risk-area" style="color: var(--accent-blue);">N/A</div>
-                <p style="color: var(--text-secondary); font-size: 0.8rem; margin-top: 0.5rem;">High Conflict Probability</p>
+            <div class="card danger-highlight animate-in" style="animation-delay: 0.3s;">
+                <h3>🚨 최우선 연구 공백 영역 (RVI)</h3>
+                <div class="value" id="top-rvi-area" style="color: #f43f5e;">N/A</div>
+                <p style="color: var(--text-secondary); font-size: 0.8rem; margin-top: 0.5rem;">연구 격차 지수: <span id="top-rvi-val" style="color: #f43f5e; font-weight: bold;">0.00</span></p>
             </div>
         </div>
 
         <div class="dashboard-grid">
             <div class="card main-chart animate-in" style="animation-delay: 0.4s;">
-                <h3>Tech-Legal Yearly Trend</h3>
-                <p style="color: var(--text-secondary); margin-bottom: 1rem;">Comparison between Academic Research vs Actual Lawsuits</p>
+                <h3>연도별 테크-레갈 트렌드 추이</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 1rem;">학술 연구 논문 수와 실제 법적 소송(판례)의 성장 곡선 비교</p>
                 <div style="height: 350px;">
                     <canvas id="trendChart"></canvas>
                 </div>
             </div>
             <div class="card sub-chart animate-in" style="animation-delay: 0.5s;">
-                <h3>Top Research Fields</h3>
-                <div style="height: 350px;">
-                    <canvas id="categoryChart"></canvas>
+                <h3>실시간 테크-레갈 시류 (핫 토픽)</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.8rem;">텍스트 마이닝을 통한 주요 연관어 결합 빈도</p>
+                <div class="hot-topics-container">
+                    <div class="topic-column">
+                        <h4>🎓 KCI 학계 연관 핫 토픽</h4>
+                        <ul id="kci-hot-list" class="hot-list"></ul>
+                    </div>
+                    <div class="topic-column">
+                        <h4>⚖️ LAW 사법 소송 연관어</h4>
+                        <ul id="law-hot-list" class="hot-list"></ul>
+                    </div>
                 </div>
             </div>
         </div>
 
         <div class="dashboard-grid">
             <div class="card animate-in" style="grid-column: 1 / -1; animation-delay: 0.6s;">
-                <h3>Keyword Gap: Academia vs. Law</h3>
-                <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Which topics are staying in research and which are moving to courtrooms?</p>
+                <h3>Research Void Index (RVI) - 연구 사각지대 분석</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+                    RVI = (판례 비중) - (논문 비중). 
+                    <span style="color: #f43f5e; font-weight: bold;">양수(+)가 높을수록 소송 급증 대비 연구가 부족한 사각지대</span>, 
+                    <span style="color: #38bdf8; font-weight: bold;">음수(-)는 이론적 학술 집중 영역</span>을 뜻합니다.
+                </p>
                 <div style="height: 400px;">
                     <canvas id="gapChart"></canvas>
                 </div>
@@ -65,9 +77,9 @@
         </div>
 
         <div class="insight-box animate-in" style="animation-delay: 0.7s;">
-            <h2>💡 AI Tech-Legal Insight</h2>
+            <h2>💡 AI 테크-레갈 자동 도출 인사이트</h2>
             <div id="insight-text">
-                <p>Analyzing cross-domain data to find meaningful patterns...</p>
+                <p>연구 및 사법 데이터를 종합 분석하여 최신 인사이트를 추출하는 중입니다...</p>
             </div>
         </div>
     </div>
