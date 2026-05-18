@@ -1,2 +1,0 @@
-# dshboard_vibecoding
-
