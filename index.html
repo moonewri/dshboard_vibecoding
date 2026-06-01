@@ -12,13 +12,34 @@
     <div class="container">
         <header>
             <div class="logo">
-                <h1>AI 테크-레갈 인사이트 대시보드 <small style="font-size: 0.4em; vertical-align: middle; opacity: 0.6;">v3.0 RVI 에디션</small></h1>
+                <h1>AI 테크-레갈 인사이트 대시보드 <small style="font-size: 0.4em; vertical-align: middle; opacity: 0.6;">v3.5 RVI 에디션</small></h1>
             </div>
             <div class="status-badge">
                 <span class="status-dot"></span>
                 실시간 API 동기화 완료
             </div>
         </header>
+
+        <div class="filter-panel animate-in" style="animation-delay: 0.05s;">
+            <div class="filter-section">
+                <h3>🎓 KCI 학술 논문 기간 필터</h3>
+                <div class="filter-controls">
+                    <label for="kci-start-year">시작:</label>
+                    <select id="kci-start-year" class="year-select"></select>
+                    <label for="kci-end-year">종료:</label>
+                    <select id="kci-end-year" class="year-select"></select>
+                </div>
+            </div>
+            <div class="filter-section">
+                <h3>⚖️ LAW 사법 판례 기간 필터</h3>
+                <div class="filter-controls">
+                    <label for="law-start-year">시작:</label>
+                    <select id="law-start-year" class="year-select"></select>
+                    <label for="law-end-year">종료:</label>
+                    <select id="law-end-year" class="year-select"></select>
+                </div>
+            </div>
+        </div>
 
         <div class="summary-grid">
             <div class="card animate-in" style="animation-delay: 0.1s;">
@@ -40,8 +61,16 @@
 
         <div class="dashboard-grid">
             <div class="card main-chart animate-in" style="animation-delay: 0.4s;">
-                <h3>연도별 테크-레갈 트렌드 추이</h3>
-                <p style="color: var(--text-secondary); margin-bottom: 1rem;">학술 연구 논문 수와 실제 법적 소송(판례)의 성장 곡선 비교</p>
+                <div class="card-header">
+                    <div>
+                        <h3 style="margin-bottom: 0.25rem;">연도별 테크-레갈 트렌드 추이</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 0;">5대 핵심 RVI 키워드 + 기타 영역의 연도별 분포 시계열 트랙킹</p>
+                    </div>
+                    <div class="toggle-group">
+                        <button id="btn-trend-freq" class="toggle-btn active">주제별 빈도 추이</button>
+                        <button id="btn-trend-rvi" class="toggle-btn">주제별 RVI 지수 추이</button>
+                    </div>
+                </div>
                 <div style="height: 350px;">
                     <canvas id="trendChart"></canvas>
                 </div>

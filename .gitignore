@@ -12,10 +12,12 @@ scratch/
 .DS_Store
 Thumbs.db
 
-# (선택 사항) 용량이 큰 원본 데이터 파일들 - 필요시 주석(#)을 해제하세요
-# *.xls
-# *.xlsx
-# *.csv
+# 용량이 큰 원본 데이터 파일 및 캐시 데이터 제외
+*.xls
+*.xlsx
+*.csv
+data/
+legal_data/
 
 # Personal Notes / Private Text Files
 사이트를 보니 빅데이터나 인공지능을 바라보면서 저작권이나 개인정.txt

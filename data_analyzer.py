@@ -150,6 +150,61 @@ def analyze_data():
     kci_hot_topics = extract_cooccurrences(kci_titles, top_n=8, require_tech=True)
     law_hot_topics = extract_cooccurrences(law_titles, top_n=8, require_tech=False)
     
+    # 5. Extract Normalized Raw Data for Client-Side Dynamic RVI calculation
+    normalized_papers = []
+    for p in papers:
+        title_texts = p.get('articleInfo', {}).get('title-group', {}).get('article-title', [])
+        if isinstance(title_texts, list):
+            full_title = " ".join([t.get('#text', '') for t in title_texts if isinstance(t, dict)])
+        else:
+            full_title = str(title_texts)
+        
+        year = p.get('journalInfo', {}).get('pub-year')
+        if not year or not ('2013' <= year <= '2026'):
+            continue
+            
+        author_group = p.get('articleInfo', {}).get('author-group', {}) or {}
+        author_data = author_group.get('author', '')
+        if isinstance(author_data, list):
+            author = ";".join([a.get('#text', '') if isinstance(a, dict) else str(a) for a in author_data])
+        elif isinstance(author_data, dict):
+            author = author_data.get('#text', '')
+        else:
+            author = str(author_data)
+            
+        category = p.get('articleInfo', {}).get('article-categories', '기타')
+        
+        matched_keys = []
+        for label, keys in target_keywords.items():
+            if any(k.lower() in full_title.lower() for k in keys):
+                matched_keys.append(label)
+                
+        normalized_papers.append({
+            "year": year,
+            "title": full_title,
+            "author": author,
+            "category": category,
+            "keywords": matched_keys
+        })
+        
+    normalized_precedents = []
+    for p in precedents:
+        case_name = p.get('사건명', '')
+        year = extract_year(p.get('선고일자'))
+        if not year or not ('2013' <= year <= '2026'):
+            continue
+            
+        matched_keys = []
+        for label, keys in target_keywords.items():
+            if any(k.lower() in case_name.lower() for k in keys):
+                matched_keys.append(label)
+                
+        normalized_precedents.append({
+            "year": year,
+            "title": case_name,
+            "keywords": matched_keys
+        })
+
     # Find Highest RVI Area
     top_rvi_area = max(keyword_stats, key=lambda x: keyword_stats[x]['rvi'])
     
@@ -160,6 +215,8 @@ def analyze_data():
         "categories": [{"name": k, "value": v} for k, v in cat_counts],
         "hotTopicsKCI": kci_hot_topics,
         "hotTopicsLaw": law_hot_topics,
+        "rawPapers": normalized_papers,
+        "rawPrecedents": normalized_precedents,
         "summary": {
             "totalPapers": len(papers),
             "totalPrecedents": len(precedents),
@@ -173,7 +230,7 @@ def analyze_data():
     with open('dashboard_data.js', 'w', encoding='utf-8') as f:
         f.write(f"const dashboardData = {json.dumps(dashboard_data, ensure_ascii=False, indent=2)};")
     
-    print("Analysis Complete. dashboard_data.js generated with RVI and Text Mining!")
+    print("Analysis Complete. dashboard_data.js generated with RVI, Text Mining, and raw lists!")
 
 if __name__ == "__main__":
     analyze_data()
